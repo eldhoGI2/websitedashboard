@@ -60,4 +60,8 @@ export async function fetchArt() {
     return new Promise(resolve => {
         setTimeout(() => resolve(randomArt), 100);
     });
+
+
+    
 }
+

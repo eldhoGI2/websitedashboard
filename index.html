@@ -3,52 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Daily Canvas | Pro</title>
+    <title>The Daily Canvas | OS</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
 </head>
 <body>
 
-<div id="app-background">
-        <div id="bg-loader" class="loader"></div>
-    </div>
+    <div id="app-background"></div>
     <div class="overlay"></div>
 
+    <button id="toggle-sidebar" class="floating-menu-btn">☰</button>
+
+    <aside id="command-sidebar" class="glass-panel collapsed">
+        <div class="sidebar-content">
+            
+            <div class="sidebar-section">
+                <h3>Widget Manager (Max 2)</h3>
+                <div class="widget-toggles">
+                    <label><input type="checkbox" class="widget-toggle" value="weather-widget"> Weather Info</label>
+                    <label><input type="checkbox" class="widget-toggle" value="finance-widget"> Crypto Market</label>
+                    <label><input type="checkbox" class="widget-toggle" value="quote-widget"> Daily Quote</label>
+                    <label><input type="checkbox" class="widget-toggle" value="stats-widget"> Study Stats</label>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Quick Links</h3>
+                <div id="custom-links-container" class="quick-links"></div>
+                <div class="add-link-form">
+                    <input type="text" id="link-name" placeholder="Name (e.g. Canvas)">
+                    <input type="url" id="link-url" placeholder="URL (https://...)">
+                    <button id="add-link-btn" class="chameleon-btn small">Add Link</button>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Scratchpad</h3>
+                <textarea id="scratchpad" placeholder="Jot down quick thoughts..."></textarea>
+                <button id="export-btn" class="chameleon-btn small" style="margin-top: 10px;">Export Data</button>
+            </div>
+        </div>
+    </aside>
+
     <main>
-        <header class="glass-panel top-bar">
-            <div id="weather-widget">
-                <span id="temp">--°C</span>
-                <span id="condition">Loading...</span>
-            </div>
-            <div class="divider"></div>
-            <div id="finance-widget">
-                <span id="btc">BTC: $...</span>
-                <span id="eth">ETH: $...</span>
-            </div>
-        </header>
+        <div id="weather-widget" class="glass-panel draggable hidden">
+            <span id="temp">--°C</span> | <span id="condition">Loading...</span>
+        </div>
+        <div id="finance-widget" class="glass-panel draggable hidden">
+            <span id="btc">BTC: $...</span> | <span id="eth">ETH: $...</span>
+        </div>
+        <div id="quote-widget" class="glass-panel draggable hidden">
+            <p id="quote-text" style="font-style: italic; font-size: 0.9rem;">"Stay hungry, stay foolish."</p>
+        </div>
+        <div id="stats-widget" class="glass-panel draggable hidden">
+            <span>🔥 Streak: <b id="streak-count">1</b> days</span>
+        </div>
 
         <section class="center-stage">
             <h1 id="clock">00:00</h1>
-            <h2 id="greeting">Good Morning.</h2>
             
+            <h1 id="focus-timer" class="hidden">25:00</h1>
+            <button id="start-focus-btn" class="chameleon-btn">Start Deep Focus</button>
+
             <div class="focus-container glass-panel">
-                <input type="text" id="focus-input" placeholder="What is your main focus today?">
+                <input type="text" id="focus-input" placeholder="Search Google, type /ai to ask Gemini, or /task for a goal...">
                 <div id="focus-display" class="hidden">
-                    <input type="checkbox" id="focus-check">
                     <span id="focus-text"></span>
                     <button id="focus-delete">×</button>
                 </div>
             </div>
         </section>
 
-        <footer class="glass-panel art-dock">
-            <div class="art-info">
-                <h3 id="art-title">Loading Art...</h3>
+        <footer class="bottom-dock">
+            <div class="glass-panel art-info">
+                <h3 id="art-title">Loading...</h3>
                 <p id="art-artist">Please wait</p>
             </div>
-            <div class="palette" id="color-palette">
-                </div>
+            
+            <div class="glass-panel heatmap-panel">
+                <p class="label" style="font-size: 0.8rem; margin-bottom: 5px; opacity: 0.8;">Activity Heatmap</p>
+                <div id="heatmap-grid" class="heatmap-grid"></div>
+            </div>
         </footer>
+
+        <div id="ai-modal" class="glass-panel modal hidden">
+            <div class="modal-header">
+                <h3>✨ AI Assistant</h3>
+                <button id="close-modal">×</button>
+            </div>
+            <div id="ai-content" class="modal-body"></div>
+        </div>
     </main>
 
     <script type="module" src="./modules/main.js"></script>
