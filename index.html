@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Daily Canvas | OS</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
 </head>
 <body>
-
     <div id="app-background"></div>
     <div class="overlay"></div>
 
@@ -19,17 +18,38 @@
         <div class="sidebar-content">
             
             <div class="sidebar-section">
-                <h3>Widget Manager (Max 2)</h3>
+                <h3>🖥️ Widget Manager (Max 4)</h3>
                 <div class="widget-toggles">
                     <label><input type="checkbox" class="widget-toggle" value="weather-widget"> Weather Info</label>
                     <label><input type="checkbox" class="widget-toggle" value="finance-widget"> Crypto Market</label>
                     <label><input type="checkbox" class="widget-toggle" value="quote-widget"> Daily Quote</label>
                     <label><input type="checkbox" class="widget-toggle" value="stats-widget"> Study Stats</label>
+                    <label><input type="checkbox" class="widget-toggle" value="flashcard-widget"> Active Recall</label>
+                    <label><input type="checkbox" class="widget-toggle" value="notes-widget"> Quick Notes</label>
                 </div>
             </div>
 
             <div class="sidebar-section">
-                <h3>Quick Links</h3>
+                <h3>🖼️ Custom Backgrounds</h3>
+                <input type="url" id="bg-url-input" placeholder="Paste Image URL...">
+                <div style="display: flex; gap: 10px;">
+                    <button id="add-bg-btn" class="chameleon-btn small">Add Image</button>
+                    <button id="clear-bg-btn" class="chameleon-btn small" style="background: rgba(255,50,50,0.2); border-color: #ff4c4c;">Revert to Art</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>📇 Flashcard Manager</h3>
+                <input type="text" id="fc-new-q" placeholder="Question / Term">
+                <input type="text" id="fc-new-a" placeholder="Answer / Definition">
+                <div style="display: flex; gap: 10px;">
+                    <button id="add-fc-btn" class="chameleon-btn small">Save Card</button>
+                    <button id="clear-fc-btn" class="chameleon-btn small" style="background: rgba(255,50,50,0.2); border-color: #ff4c4c;">Clear All</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>🔗 Quick Links</h3>
                 <div id="custom-links-container" class="quick-links"></div>
                 <div class="add-link-form">
                     <input type="text" id="link-name" placeholder="Name (e.g. Canvas)">
@@ -38,15 +58,11 @@
                 </div>
             </div>
             
-            <div class="sidebar-section">
-                <h3>Scratchpad</h3>
-                <textarea id="scratchpad" placeholder="Jot down quick thoughts..."></textarea>
-                <button id="export-btn" class="chameleon-btn small" style="margin-top: 10px;">Export Data</button>
-            </div>
+            <button id="export-btn" class="chameleon-btn small" style="margin-top: 10px;">Export Full System JSON</button>
         </div>
     </aside>
 
-    <main>
+    <main id="main-ui">
         <div id="weather-widget" class="glass-panel draggable hidden">
             <span id="temp">--°C</span> | <span id="condition">Loading...</span>
         </div>
@@ -59,16 +75,53 @@
         <div id="stats-widget" class="glass-panel draggable hidden">
             <span>🔥 Streak: <b id="streak-count">1</b> days</span>
         </div>
+        
+        <div id="flashcard-widget" class="draggable hidden">
+            <div class="flashcard-inner" id="fc-inner">
+                <div class="flashcard-front glass-panel">
+                    <span class="fc-badge">Flashcard</span>
+                    <h4 id="fc-q-display">Loading...</h4>
+                    <small style="opacity: 0.6; font-size: 0.8rem; margin-top: 5px;">Click to flip</small>
+                </div>
+                <div class="flashcard-back glass-panel">
+                    <h4 id="fc-a-display" style="color: var(--chameleon-color);">Answer</h4>
+                    <button id="fc-next-btn" class="chameleon-btn small" style="margin-top: 15px;">Next Card ➔</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="notes-widget" class="glass-panel draggable hidden">
+            <h3 style="font-size: 1rem; margin-bottom: 10px; cursor: grab; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">📝 Quick Notes</h3>
+            <textarea id="floating-notes" placeholder="Type notes here..."></textarea>
+            <button id="export-notes-btn" class="chameleon-btn small" style="margin-top: 10px;">Download .TXT</button>
+        </div>
+
+        <div id="sticky-note" class="draggable hidden">
+            <h3>📌 Tasks</h3>
+            <ul id="task-list"></ul>
+        </div>
 
         <section class="center-stage">
             <h1 id="clock">00:00</h1>
-            
             <h1 id="focus-timer" class="hidden">25:00</h1>
-            <button id="start-focus-btn" class="chameleon-btn">Start Deep Focus</button>
+            
+            <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 20px;">
+                <button id="start-focus-btn" class="chameleon-btn">Start Deep Focus</button>
+                <button id="zen-mode-btn" class="chameleon-btn" style="background: rgba(0,0,0,0.8);">Zen Mode (Esc)</button>
+            </div>
 
-            <div class="focus-container glass-panel">
-                <input type="text" id="focus-input" placeholder="Search Google, type /ai to ask Gemini, or /task for a goal...">
-                <div id="focus-display" class="hidden">
+            <div class="focus-container">
+                <input type="text" id="focus-input" placeholder="Search Google, type /ai for Gemini, or /t for task...">
+                
+                <div id="ai-modal" class="glass-panel modal hidden">
+                    <div class="modal-header">
+                        <h3>✨ AI Assistant</h3>
+                        <button id="close-modal">×</button>
+                    </div>
+                    <div id="ai-content" class="modal-body"></div>
+                </div>
+
+                <div id="focus-display" class="hidden glass-panel">
                     <span id="focus-text"></span>
                     <button id="focus-delete">×</button>
                 </div>
@@ -79,6 +132,7 @@
             <div class="glass-panel art-info">
                 <h3 id="art-title">Loading...</h3>
                 <p id="art-artist">Please wait</p>
+                <div id="color-tracker" class="color-tracker"></div>
             </div>
             
             <div class="glass-panel heatmap-panel">
@@ -87,13 +141,6 @@
             </div>
         </footer>
 
-        <div id="ai-modal" class="glass-panel modal hidden">
-            <div class="modal-header">
-                <h3>✨ AI Assistant</h3>
-                <button id="close-modal">×</button>
-            </div>
-            <div id="ai-content" class="modal-body"></div>
-        </div>
     </main>
 
     <script type="module" src="./modules/main.js"></script>

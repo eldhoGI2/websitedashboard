@@ -1,7 +1,7 @@
 // modules/ai-api.js
 
 // 1. Paste your NEW API key exactly between these quotes.
-const API_KEY = "YOUR_API_KEY_HERE"; 
+const API_KEY = "YOUR_NEW_API_KEY";
 
 // 2. Do not change this URL line. It must look exactly like this.
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
